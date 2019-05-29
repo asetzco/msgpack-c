@@ -127,6 +127,19 @@
   } \
   /** @endcond */ \
   }
+// Extending MSGPACK_DEFINE macro to add basic serialization and deserialization functions.
+#define MSGPACK_MAKE_SERIALIZABLE(...) \
+    std::string serialize(){ \
+        std::stringstream sbuf; \
+        msgpack::pack(sbuf, *this); \
+        return sbuf.str(); \
+    } \
+    void deserialize(std::string data){ \
+        msgpack::object_handle oh = msgpack::unpack(data.data(), data.size()); \
+        msgpack::object obj = oh.get(); \
+        obj.convert(*this); \
+    } \
+    MSGPACK_DEFINE(__VA_ARGS__);
 
 #if defined(MSGPACK_USE_DEFINE_MAP)
 #define MSGPACK_DEFINE MSGPACK_DEFINE_MAP
